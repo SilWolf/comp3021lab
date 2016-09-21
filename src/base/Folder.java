@@ -1,8 +1,10 @@
 package base;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class Folder {
+public class Folder implements Comparable<Folder>{
 	private ArrayList<Note> notes;
 	private String name;
 	
@@ -62,5 +64,65 @@ public class Folder {
 		}
 		
 		return this.name + ":" + nText + ":" + nImage;
+	}
+	
+	@Override
+	public int compareTo(Folder o) {
+		return this.name.compareTo(o.name);
+	}
+	
+	public void sortNotes() {
+		Collections.sort(this.notes);
+	}
+	
+	public List<Note> searchNotes(String keywords) {
+		String[] keywordsArray = keywords.split(" ");
+		
+		ArrayList<ArrayList<String>> keywordsGroup = new ArrayList<ArrayList<String>>();
+		int start = 0;
+		int end = 0;
+		while (start < keywordsArray.length && end < keywordsArray.length - 1) {
+			if (keywordsArray[start].toLowerCase() == "or") {
+				start++;
+			} else if (keywordsArray[end + 1].toLowerCase() != "or") {
+				end++;
+			} else {
+				ArrayList<String> tempKeywords = new ArrayList<String>();
+				for (int i = start; i <= end; i++) {
+					tempKeywords.add(keywordsArray[i].toLowerCase());
+				}
+				keywordsGroup.add(tempKeywords);
+				start = end + 1;
+				end = start;
+			}
+		}
+		
+		List<Note> result = new ArrayList<Note>();
+		for (Note note : this.notes) {
+			boolean contain = true;
+			for (ArrayList<String> tempKeywords : keywordsGroup) {
+				
+				
+				
+				for (String keyword : tempKeywords) {
+					if (note instanceof ImageNote) {
+						if (note.getTitle().toLowerCase().contains(keyword)) {
+							result.add(note);
+							contain = true;
+							break;
+						}
+					} else if (note instanceof TextNote) {
+						if (note.getTitle().toLowerCase().contains(keyword) || note.getContent().toLowerCase().contains(keyword)) {
+							result.add(note);
+							contain = true;
+							break;
+						}
+					}
+				}
+				if (contain) { break; }
+			}
+		}
+		
+		return result;
 	}
 }
