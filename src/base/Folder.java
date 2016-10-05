@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Folder implements Comparable<Folder>{
+public class Folder implements Comparable<Folder>, java.io.Serializable{
 	private ArrayList<Note> notes;
 	private String name;
 	
@@ -112,11 +112,13 @@ public class Folder implements Comparable<Folder>{
 							break;
 						}
 					} else if (note instanceof TextNote) {
+						/*
 						if (note.getTitle().toLowerCase().contains(keyword) || note.getContent().toLowerCase().contains(keyword)) {
 							result.add(note);
 							contain = true;
 							break;
 						}
+						*/
 					}
 				}
 				if (contain) { break; }
