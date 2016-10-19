@@ -1,7 +1,9 @@
 package base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -75,6 +77,9 @@ public class NoteBook implements Comparable<NoteBook>, java.io.Serializable {
 	}
 	
 	public void sortFolders() {
+		for (Folder folder : this.folders) {
+			folder.sortNotes();
+		}
 		Collections.sort(this.folders);
 	}
 
@@ -98,5 +103,16 @@ public class NoteBook implements Comparable<NoteBook>, java.io.Serializable {
 			return false;
 		}
 		return true;
+	}
+	
+
+	
+	public List<Note> searchNotes(String keywords) {
+		List<Note> result = new ArrayList<Note>();
+		for (Folder folder : this.folders) {
+			result.addAll(folder.searchNotes(keywords));
+		}
+		
+		return result;
 	}
 }

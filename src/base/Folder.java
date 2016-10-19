@@ -1,6 +1,7 @@
 package base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -76,20 +77,21 @@ public class Folder implements Comparable<Folder>, java.io.Serializable{
 	}
 	
 	public List<Note> searchNotes(String keywords) {
-		String[] keywordsArray = keywords.split(" ");
+		String[] keywordsArray = keywords.toLowerCase().split(" ");
 		
 		ArrayList<ArrayList<String>> keywordsGroup = new ArrayList<ArrayList<String>>();
 		int start = 0;
 		int end = 0;
-		while (start < keywordsArray.length && end < keywordsArray.length - 1) {
-			if (keywordsArray[start].toLowerCase() == "or") {
+		while (start < keywordsArray.length && end <= keywordsArray.length) {
+			if (keywordsArray[start].equals("or")) {
 				start++;
-			} else if (keywordsArray[end + 1].toLowerCase() != "or") {
+				end = start;
+			} else if (end < keywordsArray.length && !keywordsArray[end].equals("or")) {
 				end++;
 			} else {
 				ArrayList<String> tempKeywords = new ArrayList<String>();
-				for (int i = start; i <= end; i++) {
-					tempKeywords.add(keywordsArray[i].toLowerCase());
+				for (int i = start; i < end; i++) {
+					tempKeywords.add(keywordsArray[i]);
 				}
 				keywordsGroup.add(tempKeywords);
 				start = end + 1;
@@ -97,31 +99,38 @@ public class Folder implements Comparable<Folder>, java.io.Serializable{
 			}
 		}
 		
+		for (ArrayList<String> words : keywordsGroup) {
+			System.out.println(Arrays.toString(words.toArray()));
+		}
+		
+		
 		List<Note> result = new ArrayList<Note>();
 		for (Note note : this.notes) {
-			boolean contain = true;
 			for (ArrayList<String> tempKeywords : keywordsGroup) {
-				
-				
-				
-				for (String keyword : tempKeywords) {
-					if (note instanceof ImageNote) {
-						if (note.getTitle().toLowerCase().contains(keyword)) {
-							result.add(note);
-							contain = true;
+				boolean contain = true;
+				if (note instanceof ImageNote) {
+					ImageNote imageNote = (ImageNote) note;
+
+					for (String keyword : tempKeywords) {
+						if (!imageNote.getTitle().toLowerCase().contains(keyword)) {
+							contain = false;
 							break;
 						}
-					} else if (note instanceof TextNote) {
-						/*
-						if (note.getTitle().toLowerCase().contains(keyword) || note.getContent().toLowerCase().contains(keyword)) {
-							result.add(note);
-							contain = true;
+					}
+				} else if (note instanceof TextNote) {
+					TextNote textNote = (TextNote) note;
+					
+					for (String keyword : tempKeywords) {
+						if (!textNote.getTitle().toLowerCase().contains(keyword) && !textNote.getContent().toLowerCase().contains(keyword)) {
+							contain = false;
 							break;
 						}
-						*/
 					}
 				}
-				if (contain) { break; }
+				if (contain) {
+					result.add(note);
+					break;
+				}
 			}
 		}
 		
